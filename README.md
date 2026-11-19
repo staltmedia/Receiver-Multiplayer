@@ -35,6 +35,6 @@ The game is found through the Steam registry key at `<Steam>/steamapps/common/Re
 
 Release zip: `packaging/make-release.ps1 -BepInEx <BepInEx 5 x64 zip>`. The design notes are in [docs/SPEC.md](docs/SPEC.md).
 
-## License notices
+## License
 
-Bundles BepInEx and UnityDoorstop (LGPL 2.1), HarmonyX, MonoMod, Mono.Cecil and LiteNetLib (MIT). See `packaging/THIRD-PARTY-NOTICES.txt`.
+Receiver Multiplayer is MIT licensed (see [LICENSE](LICENSE)). It bundles BepInEx and UnityDoorstop (LGPL 2.1), HarmonyX, MonoMod, Mono.Cecil and LiteNetLib (MIT); see `packaging/THIRD-PARTY-NOTICES.txt`.
