@@ -1,0 +1,6 @@
+<Project>
+  <!-- Copy to Local.props (gitignored) only if the game is not in your main Steam library. -->
+  <PropertyGroup>
+    <GameDir>X:/SteamLibrary/steamapps/common/Receiver</GameDir>
+  </PropertyGroup>
+</Project>

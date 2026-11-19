@@ -1,0 +1,29 @@
+<Project>
+  <!--
+    Game location. Resolution order:
+      1. GameDir from Local.props (gitignored; copy Local.props.example).
+      2. GameDir passed on the command line: dotnet build -p:GameDir=...
+      3. <Steam install>/steamapps/common/Receiver, from the Steam registry key.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)Local.props" Condition="Exists('$(MSBuildThisFileDirectory)Local.props')" />
+
+  <PropertyGroup>
+    <SteamPath Condition="'$(SteamPath)' == '' and '$(OS)' == 'Windows_NT'">$(Registry:HKEY_CURRENT_USER\Software\Valve\Steam@SteamPath)</SteamPath>
+    <GameDir Condition="'$(GameDir)' == '' and '$(SteamPath)' != ''">$(SteamPath)/steamapps/common/Receiver</GameDir>
+    <GameManaged>$(GameDir)/Receiver_Data/Managed</GameManaged>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- Hygiene: reproducible output, no machine paths or source-control ids baked into binaries. -->
+    <Deterministic>true</Deterministic>
+    <PathMap>$(MSBuildThisFileDirectory)=./</PathMap>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Company />
+    <Authors />
+    <Copyright />
+  </PropertyGroup>
+</Project>

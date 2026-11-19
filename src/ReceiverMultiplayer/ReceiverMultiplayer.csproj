@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- The game ships no netstandard.dll, so target .NET Framework against Unity's Mono 4.x profile. -->
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>ReceiverMultiplayer</AssemblyName>
+    <RootNamespace>ReceiverMultiplayer</RootNamespace>
+    <Product>Receiver Multiplayer</Product>
+    <Version>0.7.0</Version>
+    <BepInExPluginGuid>receiver.multiplayer</BepInExPluginGuid>
+    <BepInExPluginName>Receiver Multiplayer</BepInExPluginName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- Copies LiteNetLib.dll (the only runtime dependency) to the output. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Copy the built plugin into <game>/BepInEx/plugins when BepInEx is installed there. -->
+    <DeployToGame Condition="'$(DeployToGame)' == ''">true</DeployToGame>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Compile-time only: BepInEx and HarmonyX are provided by the BepInEx install at runtime. -->
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <!-- Direct IP transport. Pinned: 1.3.1 is the last release with a net471 build (the game has no netstandard.dll). MIT. -->
+    <PackageReference Include="LiteNetLib" Version="1.3.1" />
+  </ItemGroup>
+
+  <!-- Game and Unity assemblies, referenced from the installed game; never copied or shipped. -->
+  <ItemGroup>
+    <GameReference Include="Assembly-CSharp" />
+    <GameReference Include="Assembly-CSharp-firstpass" />
+    <GameReference Include="UnityEngine" />
+    <GameReference Include="UnityEngine.CoreModule" />
+    <GameReference Include="UnityEngine.UI" />
+    <GameReference Include="UnityEngine.UIModule" />
+    <GameReference Include="UnityEngine.TextRenderingModule" />
+    <GameReference Include="UnityEngine.IMGUIModule" />
+    <GameReference Include="UnityEngine.PhysicsModule" />
+    <GameReference Include="UnityEngine.ImageConversionModule" />
+    <GameReference Include="UnityEngine.AudioModule" />
+    <GameReference Include="UnityEngine.AssetBundleModule" />
+    <GameReference Include="UnityEngine.AnimationModule" />
+    <GameReference Include="UnityEngine.UnityWebRequestModule" />
+    <GameReference Include="Unity.TextMeshPro" />
+    <GameReference Include="Unity.InputSystem" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="@(GameReference)">
+      <HintPath>$(GameManaged)/%(Identity).dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(GameManaged)/Assembly-CSharp.dll')"
+           Text="Receiver 1 was not found at '$(GameDir)'. Copy Local.props.example to Local.props and set GameDir, or pass -p:GameDir=&lt;path&gt;." />
+  </Target>
+
+  <Target Name="DeployToGame" AfterTargets="Build" Condition="'$(DeployToGame)' == 'true' and Exists('$(GameDir)/BepInEx/plugins')">
+    <PropertyGroup>
+      <PluginDeployDir>$(GameDir)/BepInEx/plugins/$(AssemblyName)</PluginDeployDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(PluginDeployDir)" />
+    <!-- Explicit allowlist: the plugin and its one runtime dependency. -->
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)LiteNetLib.dll" DestinationFolder="$(PluginDeployDir)" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(PluginDeployDir)" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+    <Message Importance="high" Text="Deployed $(TargetFileName) to $(PluginDeployDir)" />
+  </Target>
+
+</Project>
